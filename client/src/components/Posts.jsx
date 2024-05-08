@@ -1,13 +1,11 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import PostItem from "./PostItem";
 import { DUMMY_POSTS } from "../data";
-import PostItem from "../components/PostItem";
 
-const CategoryPosts = () => {
+const Posts = () => {
   const [posts, setPosts] = useState(DUMMY_POSTS);
-
   return (
-    <section>
+    <section className="posts">
       {posts.length > 0 ? (
         <div className="container posts__container">
           {posts.map(
@@ -31,4 +29,4 @@ const CategoryPosts = () => {
   );
 };
 
-export default CategoryPosts;
+export default Posts;
