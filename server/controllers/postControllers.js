@@ -6,8 +6,7 @@ const { v4: uuid } = require("uuid");
 const HttpError = require("../models/errorModel");
 
 // CREATE A POST
-// POST : api/posts
-// PROTECTED
+
 const createPost = async (req, res, next) => {
   try {
     let { title, category, description } = req.body;
@@ -62,27 +61,28 @@ const createPost = async (req, res, next) => {
 };
 
 // GET ALL POST
-// GET : api/posts
-// UNPROTECTED
 const getPosts = async (req, res, next) => {
   try {
-    const posts = await Post.find().sort({ updatedAt: -1 });
+    const posts = await Post.find()
+      .populate("creator", "name email avatar")
+      .sort({ updatedAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
     return next(new HttpError(error));
   }
 };
 
-// GET SINGLE POST
-// GET : api/posts/:id
-// UNPROTECTED
+//GET SINGLE POST
 const getPost = async (req, res, next) => {
   try {
-    const postId = req.params.id;
-    const post = await Post.findById(postId);
+    const post = await Post.findById(req.params.id)
+      .populate("creator", "name email avatar")
+      .populate("comments.creator", "name avatar");
+
     if (!post) {
       return next(new HttpError("Post not found.", 404));
     }
+
     res.status(200).json(post);
   } catch (error) {
     return next(new HttpError(error));
@@ -90,8 +90,7 @@ const getPost = async (req, res, next) => {
 };
 
 // GET POSTS BY CATEGORY
-// GET : api/posts/categories/:category
-// UNPROTECTED
+
 const getCatPosts = async (req, res, next) => {
   try {
     const { category } = req.params;
@@ -103,8 +102,7 @@ const getCatPosts = async (req, res, next) => {
 };
 
 // GET AUTHOR POST
-// GET : api/posts/users/:id
-// UNPROTECTED
+
 const getUserPosts = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -116,8 +114,6 @@ const getUserPosts = async (req, res, next) => {
 };
 
 // EDIT POST
-// PATCH : api/posts/:id
-// PROTECTED
 const editPost = async (req, res, next) => {
   try {
     let fileName;
@@ -173,7 +169,7 @@ const editPost = async (req, res, next) => {
         );
         updatedPost = await Post.findByIdAndUpdate(
           postId,
-          { title, category, description, thumnail: newFilename },
+          { title, category, description, thumbnail: newFilename },
           { new: true }
         );
       }
@@ -189,8 +185,6 @@ const editPost = async (req, res, next) => {
 };
 
 // DELETE POST
-// DELETE : api/posts/:id
-// PROTECTED
 const deletePost = async (req, res, next) => {
   try {
     const postId = req.params.id;
@@ -224,6 +218,37 @@ const deletePost = async (req, res, next) => {
   }
 };
 
+// // COMMENT POST
+
+const addComment = async (req, res, next) => {
+  const { id } = req.params;
+  const { text } = req.body;
+  if (!text) {
+    return next(new HttpError("Comment text is required.", 400));
+  }
+
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      return next(new HttpError("Post not found.", 404));
+    }
+
+    const comment = {
+      text,
+      creator: req.user._id,
+    };
+
+    console.log("Adding comment:", comment);
+
+    post.comments.push(comment);
+    await post.save();
+
+    res.status(201).json(post.comments);
+  } catch (error) {
+    return next(new HttpError("Adding comment failed.", 500));
+  }
+};
+
 module.exports = {
   createPost,
   getPosts,
@@ -232,4 +257,5 @@ module.exports = {
   getUserPosts,
   editPost,
   deletePost,
+  addComment,
 };

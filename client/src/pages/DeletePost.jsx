@@ -39,12 +39,18 @@ const DeletePost = ({ postID: id }) => {
     }
   };
 
+  const confirmAndRemovePost = () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      removePost(id);
+    }
+  };
+
   if (isLoading) {
     return <Loader />;
   }
 
   return (
-    <Link className="btn sm danger" onClick={() => removePost(id)}>
+    <Link className="btn sm danger" onClick={confirmAndRemovePost}>
       Delete
     </Link>
   );

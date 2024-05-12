@@ -48,7 +48,7 @@ const Posts = () => {
                 category={category}
                 title={title}
                 description={description}
-                authorID={creator}
+                creator={creator}
                 createdAt={createdAt}
               />
             )

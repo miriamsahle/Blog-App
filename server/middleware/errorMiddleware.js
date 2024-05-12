@@ -7,7 +7,7 @@ const notFound = (req, res, next) => {
 
 // Middleware to handle Errors
 const errorHandler = (error, req, res, next) => {
-  if (res.headerSent) {
+  if (res.headersSent) {
     return next(error);
   }
 

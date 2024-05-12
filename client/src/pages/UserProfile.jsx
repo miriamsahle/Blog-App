@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { UserContext } from "../context/userContext";
 import axios from "axios";
 
 const UserProfile = () => {
+  const { id } = useParams();
   const [avatar, setAvatar] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,33 +31,74 @@ const UserProfile = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/users/${currentUser.id}`,
-        { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
-      );
-      const { name, email, avatar } = response.data;
-      setName(name);
-      setEmail(email);
-      setAvatar(avatar);
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/users/${id}`,
+          {
+            withCredentials: true,
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const { name, email, avatar } = response.data;
+        setName(name);
+        setEmail(email);
+        setAvatar(avatar);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+        setError("Failed to load user details.");
+      }
     };
     getUser();
-  }, []);
+  }, [id, token]);
+
+  // useEffect(() => {
+  //   const getUser = async () => {
+  //     const response = await axios.get(
+  //       `${process.env.REACT_APP_BASE_URL}/users/${currentUser.id}`,
+  //       { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     const { name, email, avatar } = response.data;
+  //     setName(name);
+  //     setEmail(email);
+  //     setAvatar(avatar);
+  //   };
+  //   getUser();
+  // }, []);
 
   const changeAvatarHandler = async () => {
     setIsAvatarTouched(false);
+    const postData = new FormData();
+    postData.append("avatar", avatar);
+
     try {
-      const postData = new FormData();
-      postData.set("avatar", avatar);
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/users/change-avatar`,
         postData,
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );
-      setAvatar(response?.data.avatar);
+      setAvatar(response.data.avatar);
+      // Clear the file input here if necessary
     } catch (error) {
-      console.log(error);
+      console.error("Error updating avatar:", error);
+      setError("Failed to update avatar.");
     }
   };
+
+  // const changeAvatarHandler = async () => {
+  //   setIsAvatarTouched(false);
+  //   try {
+  //     const postData = new FormData();
+  //     postData.set("avatar", avatar);
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_BASE_URL}/users/change-avatar`,
+  //       postData,
+  //       { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     setAvatar(response?.data.avatar);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const updateUserDetails = async (e) => {
     e.preventDefault();

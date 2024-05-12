@@ -8,8 +8,7 @@ const User = require("../models/userModel");
 const HttpError = require("../models/errorModel");
 
 // REGISTER A NEW USER
-// POST : api/users/register
-// UNPROTECTED
+
 const registerUser = async (req, res, next) => {
   try {
     const { name, email, password, password2 } = req.body;
@@ -46,8 +45,6 @@ const registerUser = async (req, res, next) => {
 };
 
 // LOGIN A REGISTERED USER
-// POST : api/users/login
-// UNPROTECTED
 
 const loginUser = async (req, res, next) => {
   try {
@@ -80,8 +77,6 @@ const loginUser = async (req, res, next) => {
 };
 
 // USER PROFILE
-// POST : api/users/:id
-// PROTECTED
 
 const getUser = async (req, res, next) => {
   try {
@@ -97,8 +92,7 @@ const getUser = async (req, res, next) => {
 };
 
 // CHANGE USER AVATAR(profile picture)
-// POST : api/users/change-avatar
-// PROTECTED
+
 const changeAvatar = async (req, res, next) => {
   try {
     if (!req.files.avatar) {
@@ -157,8 +151,7 @@ const changeAvatar = async (req, res, next) => {
 };
 
 // EDIT USER DETAILS(from profile)
-// POST : api/users/edit-user
-// PROTECTED
+
 const editUser = async (req, res, next) => {
   try {
     const { name, email, currentPassword, newPassword, confirmNewPassword } =
@@ -211,8 +204,7 @@ const editUser = async (req, res, next) => {
 };
 
 // GET USER(authors)
-// POST : api/users/authors
-// UNPROTECTED
+
 const getAuthors = async (req, res, next) => {
   try {
     const authors = await User.find().select("-password");

@@ -8,6 +8,7 @@ const {
   getUserPosts,
   editPost,
   deletePost,
+  addComment,
 } = require("../controllers/postControllers");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = Router();
@@ -19,5 +20,6 @@ router.get("/categories/:category", getCatPosts);
 router.get("/users/:id", getUserPosts);
 router.patch("/:id", authMiddleware, editPost);
 router.delete("/:id", authMiddleware, deletePost);
+router.post("/:id/comments", authMiddleware, addComment);
 
 module.exports = router;
